@@ -29,8 +29,8 @@ g = (d - 1) // 2
 print(f"Computed parameters: {d = }, {g = }")
 
 # STEP 3: Compute pole numbers
-f_pole_numbers = [2*i for i in range(X)] + [d + i for i in range(K)]
-g_pole_numbers = [2*i for i in range(X)] + [2*X - 2 + K*(i + 1) for i in range(L)]
+f_pole_numbers = [2*j for j in range(X)] + [d + k for k in range(K)]
+g_pole_numbers = [2*j for j in range(X)] + [2*X - 2 + K*(l + 1) for l in range(L)]
 h_pole_numbers = sorted(set(f + g for f in f_pole_numbers for g in g_pole_numbers))
 
 print("Pole numbers:")
@@ -46,16 +46,17 @@ print(pole_number_table(f_pole_numbers, g_pole_numbers))
 Fq = GF(q)
 F.<x> = FunctionField(Fq)
 
-p = prod(x - i for i in Fq.list()[:d])
+alphas = Fq.list()[:d]
+s = prod(x - a for a in alphas)
 r = 1 if q % 2 == 0 else 0  # add a nonzero r for fields of characteristic two
 
 _.<T> = F[]
-F.<y> = F.extension(T^2 + r*T - p)
+F.<y> = F.extension(T^2 + r*T - s)
 x = F(x)
 
 print("Function field genus:", F.genus())
 
-assert 2 * F.genus() + 1 == d 
+assert 2 * F.genus() + 1 == d
 
 Pinf = F.places_infinite(1)[0]
 
@@ -133,7 +134,7 @@ B_enc = vector_matrix_multiplication(S + B_split, GB)
 C_enc = [a * b for a, b in zip(A_enc, B_enc)]
 
 # Decode
-encoded_blocks = vector_matrix_multiplication(C_enc, GC^-1)[-K*L:]
+encoded_blocks = vector_matrix_multiplication(C_enc, GC^-1)[-K*L:]  # take the last K*L blocks
 C = assemble_block_matrix_in_column_order(encoded_blocks, K, L)
 
 if C == A*B:
